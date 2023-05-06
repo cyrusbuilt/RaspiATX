@@ -1,0 +1,10 @@
+# PlatformIO temp stuff
+.pio
+
+# Don't need these
+test/
+
+# macOS crap
+.DS_Store
+
+.vscode
