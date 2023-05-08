@@ -52,10 +52,12 @@ bool AtxControllerClass::isSystemBooted() {
 }
 
 void AtxControllerClass::doSoftOffDetection() {
+	// Abort if soft-detection is disabled.
 	if (!_shutdownDetection) {
 		return;
 	}
 
+	// Abort if both the PSU and the Raspberry Pi are not running.
 	bool systemBooted = isSystemBooted();
 	if ((_currentState == SystemState::OFF && !systemBooted)
 		|| (_currentState != SystemState::OFF && systemBooted)) {
@@ -63,12 +65,15 @@ void AtxControllerClass::doSoftOffDetection() {
 		return;
 	}
 
+	// We detected shutdown, delay a little bit here to make sure everything
+	// shut down properly.
 	if (!systemBooted && _currentState != SystemState::OFF && _timeDown < SOFT_OFF_THRESHOLD) {
 		delay(SOFT_OFF_DELAY);
 		_timeDown += SOFT_OFF_DELAY;
 		return;
 	}
 
+	// Shutdown detected and delay has expired. Let's power this puppy down!
 	if (!systemBooted && _currentState != SystemState::OFF && _timeDown >= SOFT_OFF_THRESHOLD) {
 		Serial.println(F("DEBUG: *** Raspberry Pi no longer running! Powering off! ***"));
 		digitalWrite(PIN_PS_ON, HIGH);
@@ -82,17 +87,23 @@ void AtxControllerClass::doSoftOffDetection() {
 }
 
 void AtxControllerClass::loop() {
+	// Abort if the driver isn't initialized yet.
 	if (!_initialized) {
 		return;
 	}
 
+	// Process button events.
 	ButtonEvent.loop();
 
+	// Monitor for PSU state change.
 	int pwrOkState = digitalRead(PIN_PWR_OK);
 	if (digitalRead(PIN_PS_ON) == LOW && pwrOkState == LOW) {
 		_currentState = SystemState::OFF;
 	}
 
+	// Check for PSU state change. If PWR_OK is HIGH and the current state is
+	// OFF or INIT, then transition to ON. If PWR_OK is LOW and the current
+	// state is ON, then transition to OFF.
 	if (pwrOkState != _lastPowerOkState) {
 		Serial.print(F("DEBUG: PWR_OK state changed: "));
 		Serial.println(pwrOkState);
@@ -104,6 +115,7 @@ void AtxControllerClass::loop() {
 		}
 	}
 
+	// Store the last known PSU state and handle the system state change.
 	_lastPowerOkState = pwrOkState;
 	if (_currentState != _lastState) {
 		Serial.print(F("DEBUG: System state changed: "));
@@ -137,6 +149,7 @@ void AtxControllerClass::loop() {
 		enableSoftOffDetection();
 	}
 
+	// Process soft-off detection and store the last know sytem state.
 	doSoftOffDetection();
 	_lastState = _currentState;
 }
