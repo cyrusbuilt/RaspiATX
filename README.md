@@ -3,6 +3,8 @@
 
 An ATX-style power management controller for Raspberry Pi.
 
+![RaspiATX](board.jpg)
+
 ## Synopsis
 
 Many years ago, when the [Raspberry Pi](https://www.raspberrypi.com/) first came out, I came up with the idea (as did many others) to use one as a Home Theater PC (HTPC), so I came up with [this project](https://github.com/cyrusbuilt/CyrusBuiltHTPC). This was a crude but effective attempt at an Arduino-based ATX power management system to be used with the Raspiberry Pi along with a bunch of shell scripts to turn a normal Raspberry Pi Linux OS (Debian Jessie-based back then I believe) into a HTPC OS that booted straight into XMBC (which later became [Kodi](https://kodi.tv/)). The hardware was all packed in a Mini-ITX chassis which had it's own ATX power supply (DC-to-DC converter), but given the design of the Raspberry Pi, it's not exactly ATX-compliant. Hence the need for a power-management system if I wanted it to behave like a normal PC in that sense. But nowadays, there are custom Linux distributions like [LibreELEC](https://libreelec.tv/) that make my previous efforts obsolete. You can even get special carrier boards for Raspberry Pi and CM4 modules that do the ATX stuff (and more!).
